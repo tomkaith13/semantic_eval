@@ -163,7 +163,48 @@ def run_message(
     except requests.RequestException as exc:
         print(f"[run] Request failed: {exc}")
         return None
+    
+def parse_last_run_event(run_events: list[Dict[str, Any]] | None) -> None:
+    """Parse and print details from the last run event in a factored helper.
 
+    Extracts nested message.parts[].text if present.
+    """
+    if not run_events or not isinstance(run_events, list):
+        print("No run events to parse.")
+        return None
+    last = run_events[-1]
+    data = last.get("data")
+    print("*" * 40)
+    print(f"Last raw data: {data!r}")
+    if not isinstance(data, str):
+        print("Data is not a string; cannot parse as JSON.")
+        return None
+    try:
+        data_json = json.loads(data)
+    except json.JSONDecodeError:
+        print("Data is not valid JSON.")
+        return None
+    print(f"Parsed JSON keys: {list(data_json.keys())}")
+    message_obj = data_json.get("message")
+    if not isinstance(message_obj, dict):
+        print("No 'message' object found.")
+        return None
+    parts = message_obj.get("parts", [])
+    if not isinstance(parts, list):
+        print("'message.parts' not a list.")
+        return None
+    for idx, part in enumerate(parts):
+        if isinstance(part, dict):
+            txt = part.get("text")
+            if isinstance(txt, str):
+                print(f"Part[{idx}] text: {txt}")
+                return txt  # Return the first text found
+            else:
+                print(f"Part[{idx}] has no text field or not a string.")
+                return None
+        else:
+            print(f"Part[{idx}] is not a dict: {part!r}")
+            return None
 
 def main():
     print("Hello from sentence-sim!")
@@ -186,33 +227,15 @@ def main():
         stream=True,
     )
 
-    print("*" * 40)
-    print(f"last run events: {run_events[-1]['data']}")
-    # print(f" type: {type(run_events[-2]['data'])}")
-    message = ""
-    data = run_events[-1]['data']
-    if isinstance(data, str):
-        try:
-            data_json = json.loads(data)
-            print(f"Parsed data as JSON: {data_json}")
-            message = data_json.get("message", "")
-            print(f"Extracted message: {message}")
+    text = parse_last_run_event(run_events)
+    print(f"Extracted text from last run event: {text!r}")
 
-            parts = message.get("parts", [])
-            for part in parts:
-                print(f"Part: {part}")
-                print(f"Type of part: {type(part)}")
-                if "text" in part:
-                    print(f"Text part: {part['text']}")
-                
-
-            
-            
-        except json.JSONDecodeError:
-            print("Data is not valid JSON.")
-    else:
-        print("Data is not a string; cannot parse as JSON.")
-        return
+    # Demonstrate similarity scoring so the pipeline still produces a value
+    score = score_similarity(
+        "The contributions in your LSA is around $42.00",
+        "42 dollars is your LSA contribution",
+    )
+    print(f"Computed similarity score: {score:.4f}")
 
     # Demonstrate similarity scoring so the pipeline still produces a value
     # score = score_similarity(
@@ -220,6 +243,9 @@ def main():
     #     "42 dollars is your LSA contribution",
     # )
     # print(f"Computed similarity score: {score:.4f}")
+
+
+
 
 
 if __name__ == "__main__":
