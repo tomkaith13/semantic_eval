@@ -37,7 +37,7 @@ README.md                # This file
 ## ✅ Requirements
 
 - Python 3.13 (specified in `pyproject.toml`). Earlier versions may work but are not guaranteed.
-- Internet access on first run (downloads the `all-mpnet-base-v2` model from Hugging Face).
+- Internet access on first run (downloads the [all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) model from Hugging Face).
 - (Optional) A running backend exposing:
   - `POST http://localhost:8080/v1/sessions`
   - `POST http://localhost:8080/v1/run` (supports `X-Stream: true` for SSE-like streaming)
