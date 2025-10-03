@@ -1,6 +1,7 @@
 import os
 import json
 from typing import Any, Dict
+from uuid import uuid4
 from dotenv import load_dotenv
 
 import requests
@@ -9,6 +10,7 @@ from similarity_scorer.score import score_similarity
 
 
 SESSIONS_URL = "http://localhost:8080/v1/sessions"
+RUN_URL = "http://localhost:8080/v1/run"
 load_dotenv()  # Load environment variables from a .env file if present
 
 def create_session(payload: Dict[str, Any] | None = None) -> Dict[str, Any] | None:
@@ -53,6 +55,116 @@ def create_session(payload: Dict[str, Any] | None = None) -> Dict[str, Any] | No
         return None
 
 
+def run_message(
+    message: str,
+    session_id: str,
+    run_id: str | None = None,
+    stream: bool = True,
+    timeout: int = 30,
+) -> Dict[str, Any] | list[Dict[str, Any]] | None:
+    """Call the /v1/run endpoint replicating provided curl.
+
+    curl reference:
+    curl --location 'http://localhost:8080/v1/run' \\
+         --header 'X-Stream: true' \\
+         --header 'Content-Type: application/json' \\
+         --header 'Authorization: Bearer <TOKEN>' \\
+         --data '{"id":"<run_uuid>","session_id":"<session_uuid>","message":"..."}'
+    """
+    token = os.getenv("BEARER_TOKEN", "").strip()
+    if not token:
+        print("[run] BEARER_TOKEN not set; skipping API call.")
+        return None
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
+    }
+    if stream:
+        headers["X-Stream"] = "true"
+
+    payload: Dict[str, Any] = {
+        "session_id": session_id,
+        "message": message,
+    }
+    if run_id:
+        payload["id"] = run_id
+    else:
+        # Auto-generate a GUID for this run distinct from the session_id
+        run_id = str(uuid4())
+        payload["id"] = run_id
+
+    print(f"[run] using run id {run_id}")
+
+    try:
+        resp = requests.post(
+            RUN_URL,
+            headers=headers,
+            json=payload,
+            timeout=timeout,
+            stream=stream,
+        )
+        print(f"[run] status={resp.status_code}")
+        if not resp.ok:
+            print("[run] Non-2xx status; body preview:", resp.text[:300])
+        if stream:
+            # Proper SSE parsing: events separated by blank lines, with lines like:
+            # event: <type>
+            # id: <id>
+            # data: {"json":true}
+            events: list[Dict[str, Any]] = []
+            current: Dict[str, Any] = {}
+
+            def finalize_current():
+                nonlocal current
+                if not current:
+                    return
+                # Attempt JSON decode on data field if it's a JSON object/string
+                
+               
+                preview = current.get("data")
+                if preview == "[DONE]":
+                    return
+
+                preview_json = json.loads(preview) if preview else None
+                if not preview_json:
+                    return
+
+                preview_str = str(preview_json)
+                print(f"[run][event] {preview_str}")
+                events.append(current)
+                current = {}
+
+            for raw_line in resp.iter_lines(decode_unicode=True):
+                if raw_line is None:
+                    continue
+                line = raw_line.rstrip("\n")
+                if not line:  # Blank line ends an event
+                    finalize_current()
+                    continue
+                if line.startswith(":"):  # Comment line in SSE; skip
+                    continue
+                if ":" in line:
+                    field, value = line.split(":", 1)
+                    current[field.strip()] = value.lstrip()
+                else:
+                    # Continuation line for data
+                    current["data"] = (current.get("data", "") + "\n" + line).strip()
+
+            # Final flush if stream ended without trailing blank line
+            finalize_current()
+            return events
+        else:
+            # Non-stream JSON
+            try:
+                return resp.json()
+            except json.JSONDecodeError:
+                return {"raw": resp.text[:500]}
+    except requests.RequestException as exc:
+        print(f"[run] Request failed: {exc}")
+        return None
+
+
 def main():
     print("Hello from sentence-sim!")
 
@@ -61,15 +173,48 @@ def main():
     if session_resp is not None:
         print("Created/queried session response snippet:", str(session_resp)[:200])
     
-    session_id =session_resp.get("id", None)
+    session_id = session_resp.get("id") if session_resp else None
     if not session_id:
         print("No session ID returned; skipping /run call.")
         return
-    
-    
 
-    # Placeholder: call /run endpoint next (not yet implemented)
+    # Example run call
+    run_events = run_message(
+        message="what is my in network deductible?",
+        session_id=session_id,
+        run_id=None,  # Could supply a UUID string
+        stream=True,
+    )
 
+    print("*" * 40)
+    print(f"last run events: {run_events[-1]['data']}")
+    # print(f" type: {type(run_events[-2]['data'])}")
+    message = ""
+    data = run_events[-1]['data']
+    if isinstance(data, str):
+        try:
+            data_json = json.loads(data)
+            print(f"Parsed data as JSON: {data_json}")
+            message = data_json.get("message", "")
+            print(f"Extracted message: {message}")
+
+            parts = message.get("parts", [])
+            for part in parts:
+                print(f"Part: {part}")
+                print(f"Type of part: {type(part)}")
+                if "text" in part:
+                    print(f"Text part: {part['text']}")
+                
+
+            
+            
+        except json.JSONDecodeError:
+            print("Data is not valid JSON.")
+    else:
+        print("Data is not a string; cannot parse as JSON.")
+        return
+
+    # Demonstrate similarity scoring so the pipeline still produces a value
     # score = score_similarity(
     #     "The contributions in your LSA is around $42.00",
     #     "42 dollars is your LSA contribution",
