@@ -17,5 +17,7 @@ def score_similarity(result_ans=text1, golden_ans=text2):
 
     # Compute cosine-similarity score
     cosine_score = util.pytorch_cos_sim(embedding1, embedding2)
-    print(f"Similarity score between \n Obtained answer: '{result_ans}' \n\nAND\n\n Golden answer: '{golden_ans}' \n\nis\n\n{cosine_score.item():.4f}")
+    print(
+        f"Similarity score between \n Obtained answer: '{result_ans}' \n\nAND\n\n Golden answer: '{golden_ans}' \n\nis\n\n{cosine_score.item():.4f}"
+    )
     return cosine_score.item()

@@ -14,6 +14,7 @@ SESSIONS_URL = "http://localhost:8080/v1/sessions"
 RUN_URL = "http://localhost:8080/v1/run"
 load_dotenv()  # Load environment variables from a .env file if present
 
+
 def create_session(payload: Dict[str, Any] | None = None) -> Dict[str, Any] | None:
     """Call the sessions API equivalent to provided curl.
 
@@ -23,7 +24,6 @@ def create_session(payload: Dict[str, Any] | None = None) -> Dict[str, Any] | No
          --header 'Authorization: Bearer <TOKEN>' \
          --data '{}'
     """
-
 
     token = os.getenv("BEARER_TOKEN", "").strip()
     if not token:
@@ -121,8 +121,7 @@ def run_message(
                 if not current:
                     return
                 # Attempt JSON decode on data field if it's a JSON object/string
-                
-               
+
                 preview = current.get("data")
                 if preview == "[DONE]":
                     return
@@ -164,7 +163,8 @@ def run_message(
     except requests.RequestException as exc:
         print(f"[run] Request failed: {exc}")
         return None
-    
+
+
 def parse_last_run_event(run_events: list[Dict[str, Any]] | None) -> None:
     """Parse and print details from the last run event in a factored helper.
 
@@ -207,6 +207,7 @@ def parse_last_run_event(run_events: list[Dict[str, Any]] | None) -> None:
             # print(f"Part[{idx}] is not a dict: {part!r}")
             return None
 
+
 def main():
     print("Hello from sentence-sim!")
 
@@ -214,7 +215,7 @@ def main():
     session_resp = create_session()
     if session_resp is not None:
         print("Created/queried session response snippet:", str(session_resp)[:200])
-    
+
     session_id = session_resp.get("id") if session_resp else None
     if not session_id:
         print("No session ID returned; skipping /run call.")
@@ -252,9 +253,6 @@ def main():
     #     "42 dollars is your LSA contribution",
     # )
     # print(f"Computed similarity score: {score:.4f}")
-
-
-
 
 
 if __name__ == "__main__":
