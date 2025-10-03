@@ -240,6 +240,20 @@ print(score_similarity(
 Run with:
 ```bash
 python quick_score.py
+print(score_similarity(
+...     "Your LSA contribution is $42.",
+...     "42 dollars is your LSA contribution",
+... ))
+Similarity score between 
+ Obtained answer: 'Your LSA contribution is $42.' 
+
+AND
+
+ Golden answer: '42 dollars is your LSA contribution' 
+
+is
+
+0.9361
 ```
 
 ---
