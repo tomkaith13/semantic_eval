@@ -63,9 +63,10 @@ This will create/refresh a virtual environment and install dependencies from `py
 ### 3. Configure Environment
 Create a `.env` file (or export in your shell):
 ```
+API_BASE_URL=http://localhost:8080
 BEARER_TOKEN=your_api_token_here
 ```
-If omitted, the script will print a message and skip the API portion (the similarity scoring loop will also be skipped because no session is established).
+`API_BASE_URL` defaults to `http://localhost:8080` if omitted. If `BEARER_TOKEN` is omitted, the script will print a message and skip the API portion (the similarity scoring loop will also be skipped because no session is established).
 
 ### 4. Run
 ```bash
@@ -189,12 +190,14 @@ ruff check . --fix
 
 ## 🔐 Environment Variables
 
-| Variable       | Purpose                               | Required |
-|----------------|----------------------------------------|----------|
-| `BEARER_TOKEN` | Auth token for remote API calls        | No (skips network if absent) |
+| Variable        | Purpose                                                | Required |
+|-----------------|--------------------------------------------------------|----------|
+| `API_BASE_URL`  | Base URL for backend (e.g. http://localhost:8080)      | No (defaults to http://localhost:8080) |
+| `BEARER_TOKEN`  | Auth token for remote API calls                        | No (skips network if absent) |
 
-You can export it instead of using `.env`:
+You can export them instead of using `.env`:
 ```bash
+export API_BASE_URL=http://localhost:8080
 export BEARER_TOKEN=your_api_token_here
 ```
 

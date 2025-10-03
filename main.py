@@ -9,17 +9,33 @@ import requests
 
 from similarity_scorer.score import score_similarity
 
+# Load environment variables from a .env file if present
+load_dotenv()
 
-SESSIONS_URL = "http://localhost:8080/v1/sessions"
-RUN_URL = "http://localhost:8080/v1/run"
-load_dotenv()  # Load environment variables from a .env file if present
+
+def _build_url(path: str) -> str:
+    """Construct a full URL from API_BASE_URL and a path starting with '/'.
+
+    Falls back to http://localhost:8080 if API_BASE_URL not provided.
+    Ensures no duplicate slashes.
+    """
+    base = os.getenv("API_BASE_URL", "http://localhost:8080").strip().rstrip("/")
+    if not base:
+        base = "http://localhost:8080"  # final safety fallback
+    if not path.startswith("/"):
+        path = "/" + path
+    return f"{base}{path}"
+
+
+SESSIONS_URL = _build_url("/v1/sessions")
+RUN_URL = _build_url("/v1/run")
 
 
 def create_session(payload: Dict[str, Any] | None = None) -> Dict[str, Any] | None:
     """Call the sessions API equivalent to provided curl.
 
-    curl reference:
-    curl --location 'http://localhost:8080/v1/sessions' \
+    curl reference (domain now driven by API_BASE_URL env var):
+    curl --location '${API_BASE_URL:-http://localhost:8080}/v1/sessions' \
          --header 'Content-Type: application/json' \
          --header 'Authorization: Bearer <TOKEN>' \
          --data '{}'
@@ -65,8 +81,8 @@ def run_message(
 ) -> Dict[str, Any] | list[Dict[str, Any]] | None:
     """Call the /v1/run endpoint replicating provided curl.
 
-    curl reference:
-    curl --location 'http://localhost:8080/v1/run' \\
+    curl reference (domain now driven by API_BASE_URL env var):
+    curl --location '${API_BASE_URL:-http://localhost:8080}/v1/run' \\
          --header 'X-Stream: true' \\
          --header 'Content-Type: application/json' \\
          --header 'Authorization: Bearer <TOKEN>' \\
@@ -210,6 +226,7 @@ def parse_last_run_event(run_events: list[Dict[str, Any]] | None) -> None:
 
 def main():
     print("Hello from sentence-sim!")
+    print(f"Using API_BASE_URL: {os.getenv('API_BASE_URL', 'http://localhost:8080')}")
 
     # Call sessions API (will skip if SESSION_API_TOKEN is not set)
     session_resp = create_session()
