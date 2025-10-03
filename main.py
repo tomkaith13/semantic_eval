@@ -3,6 +3,7 @@ import json
 from typing import Any, Dict
 from uuid import uuid4
 from dotenv import load_dotenv
+from ground_truth.gt import ground_truth_samples
 
 import requests
 
@@ -131,7 +132,7 @@ def run_message(
                     return
 
                 preview_str = str(preview_json)
-                print(f"[run][event] {preview_str}")
+                print(f"[run][event] {str(preview_str)[:90]} ...")
                 events.append(current)
                 current = {}
 
@@ -197,13 +198,13 @@ def parse_last_run_event(run_events: list[Dict[str, Any]] | None) -> None:
         if isinstance(part, dict):
             txt = part.get("text")
             if isinstance(txt, str):
-                print(f"Part[{idx}] text: {txt}")
+                # print(f"Part[{idx}] text: {txt}")
                 return txt  # Return the first text found
             else:
                 print(f"Part[{idx}] has no text field or not a string.")
                 return None
         else:
-            print(f"Part[{idx}] is not a dict: {part!r}")
+            # print(f"Part[{idx}] is not a dict: {part!r}")
             return None
 
 def main():
@@ -220,22 +221,30 @@ def main():
         return
 
     # Example run call
-    run_events = run_message(
-        message="what is my in network deductible?",
-        session_id=session_id,
-        run_id=None,  # Could supply a UUID string
-        stream=True,
-    )
 
-    text = parse_last_run_event(run_events)
-    print(f"Extracted text from last run event: {text!r}")
+    for example in ground_truth_samples:
+        question = example["question"]
+        print("Example from GT:", question)
 
-    # Demonstrate similarity scoring so the pipeline still produces a value
-    score = score_similarity(
-        "The contributions in your LSA is around $42.00",
-        "42 dollars is your LSA contribution",
-    )
-    print(f"Computed similarity score: {score:.4f}")
+        run_events = run_message(
+            message=question,
+            session_id=session_id,
+            run_id=None,  # Could supply a UUID string
+            stream=True,
+        )
+
+        response = parse_last_run_event(run_events)
+        print(f"Extracted text from last run event: {response!r}")
+
+        # Demonstrate similarity scoring so the pipeline still produces a value
+        print("*" * 100)
+        print("Scoring similarity against ground truth answer...")
+        score = score_similarity(
+            response,
+            example["answer"],
+        )
+        print(f"Computed similarity score: {score:.4f}")
+        print("*" * 100)
 
     # Demonstrate similarity scoring so the pipeline still produces a value
     # score = score_similarity(
