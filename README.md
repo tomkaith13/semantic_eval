@@ -53,19 +53,12 @@ git clone <your-fork-or-repo-url> sentence-sim
 cd sentence-sim
 ```
 
-### 2. (Option A) Install with uv (recommended if you have it)
+### 2. Install with uv (recommended if you have it)
 ```bash
 uv sync
 ```
 This will create/refresh a virtual environment and install dependencies from `pyproject.toml` + `uv.lock`.
 
-### 2. (Option B) Install with pip + venv
-```bash
-python3.13 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -e .
-```
 
 ### 3. Configure Environment
 Create a `.env` file (or export in your shell):
