@@ -8,5 +8,13 @@ Dental Claims: Your dentist can submit these electronically on your behalf, or y
 Disability Claims: For disability claims, you'll need to complete a Short Term Disability/Long Term Disability Member's statement. For Long Term Disability or Waiver of Premiums, an attending physician must also complete a corresponding statement.
 You can find all necessary claim forms at www.manulife.ca/groupbenefits or by contacting your plan administrator.
 Does this information help, or would you like more specific details on one of these submission methods?""",
-    }
+    },
+    {
+        "question": "How would you submit a claim online?",
+        "answer": """You just dont. you use shout it out loud and it gets submitted.""",
+    },
+    {
+        "question": "Why did the chicken cross the road?",
+        "answer": """I dont know!""",
+    },
 ]

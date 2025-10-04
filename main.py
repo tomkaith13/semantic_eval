@@ -192,7 +192,7 @@ def parse_last_run_event(run_events: list[Dict[str, Any]] | None) -> None:
     last = run_events[-1]
     data = last.get("data")
     print("*" * 40)
-    print(f"Last raw data: {data!r}")
+    # print(f"Last raw data: {data!r}")
     if not isinstance(data, str):
         print("Data is not a string; cannot parse as JSON.")
         return None
@@ -228,19 +228,19 @@ def main():
     print("Hello from sentence-sim!")
     print(f"Using API_BASE_URL: {os.getenv('API_BASE_URL', 'http://localhost:8080')}")
 
-    # Call sessions API (will skip if SESSION_API_TOKEN is not set)
-    session_resp = create_session()
-    if session_resp is not None:
-        print("Created/queried session response snippet:", str(session_resp)[:200])
-
-    session_id = session_resp.get("id") if session_resp else None
-    if not session_id:
-        print("No session ID returned; skipping /run call.")
-        return
-
     # Example run call
 
     for example in ground_truth_samples:
+        # Call sessions API (will skip if SESSION_API_TOKEN is not set)
+        session_resp = create_session()
+        if session_resp is not None:
+            print("Created/queried session response snippet:", str(session_resp)[:200])
+
+        session_id = session_resp.get("id") if session_resp else None
+        if not session_id:
+            print("No session ID returned; skipping /run call.")
+            return
+
         question = example["question"]
         print("Example from GT:", question)
 
@@ -252,7 +252,6 @@ def main():
         )
 
         response = parse_last_run_event(run_events)
-        print(f"Extracted text from last run event: {response!r}")
 
         # Demonstrate similarity scoring so the pipeline still produces a value
         print("*" * 100)
