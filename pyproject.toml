@@ -8,6 +8,7 @@ dependencies = [
     "dotenv>=0.9.9",
     "getenv>=0.2.0",
     "requests>=2.32.5",
+    "rouge-score>=0.1.2",
     "sentence-transformers>=5.1.1",
 ]
 

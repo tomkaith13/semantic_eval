@@ -113,6 +113,7 @@ def run_message(
                     return
                 preview = current.get("data")
                 if preview == "[DONE]":
+                    print("[run][event] [DONE]")
                     return
                 try:
                     preview_json = json.loads(preview) if preview else None

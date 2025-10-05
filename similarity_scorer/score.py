@@ -21,3 +21,11 @@ def score_similarity(result_ans=text1, golden_ans=text2):
         f"Similarity score between \n Obtained answer: '{result_ans}' \n\nAND\n\n Golden answer: '{golden_ans}' \n\nis\n\n{cosine_score.item():.4f}"
     )
     return cosine_score.item()
+
+
+def rouge_score(result_ans=text1, golden_ans=text2):
+    from rouge_score import rouge_scorer
+
+    scorer = rouge_scorer.RougeScorer(["rouge1"], use_stemmer=True)
+    scores = scorer.score(golden_ans, result_ans)
+    return scores

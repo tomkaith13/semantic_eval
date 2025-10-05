@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from ground_truth.gt import ground_truth_samples
-from similarity_scorer.score import score_similarity
+from similarity_scorer.score import score_similarity, rouge_score
 from api import create_session, run_message, parse_last_run_event
 
 # Load environment variables from a .env file if present
@@ -31,8 +31,10 @@ def run_examples() -> None:
         response = parse_last_run_event(run_events)
         print("*" * 100)
         print("Scoring similarity against ground truth answer...")
-        score = score_similarity(response, example["answer"])
-        print(f"Computed similarity score: {score:.4f}")
+        sim_score = score_similarity(response, example["answer"])
+        print(f"Computed similarity score: {sim_score:.4f}")
+        rouge_scores = rouge_score(response, example["answer"])
+        print(f"Computed ROUGE-1 scores: {rouge_scores}")
         print("*" * 100)
 
 
