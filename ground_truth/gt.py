@@ -15,6 +15,6 @@ Does this information help, or would you like more specific details on one of th
     },
     {
         "question": "Why did the chicken cross the road?",
-        "answer": """I dont know!""",
+        "answer": """This bot is not programmed to answer that question. please ask health related questions.""",
     },
 ]
