@@ -1,11 +1,15 @@
 # sentence-sim
 
-A minimal pipeline that:
+A minimal, single-turn eval pipeline that:
 
 1. (Optionally) creates a remote chat "session" via an HTTP API (`/v1/sessions`).
 2. Streams a question to a model/runtime (`/v1/run`) and captures Server‑Sent Event (SSE) style chunks.
 3. Extracts the final textual response from the streamed events.
 4. Computes a semantic similarity score between the model's answer and a curated ground‑truth answer using a Sentence Transformer model (`all-mpnet-base-v2`).
+5. Computes ROUGE-1 score to check for word matches.
+
+TL;DR
+Think of this as Postman Runner combined with an eval.
 
 > If the required bearer token is not set, the network calls are skipped so you can still experiment locally with the similarity scoring component.
 
@@ -233,7 +237,7 @@ Currently no explicit license is declared. Add one (e.g., MIT, Apache-2.0) in th
 
 If you only want the scoring capability, create a file like `quick_score.py`:
 ```python
-from similarity_scorer.score import score_similarity
+from similarity_scorer.score import score_similarity,rouge_score
 
 print(score_similarity(
 	"Your LSA contribution is $42.",
@@ -257,6 +261,8 @@ AND
 is
 
 0.9361
+ print(rouge_score("Your LSA contribution is $42.", "42 dollars is your LSA contribution"))
+ {'rouge1': Score(precision=1.0, recall=0.8333333333333334, fmeasure=0.9090909090909091)}
 ```
 
 ---
