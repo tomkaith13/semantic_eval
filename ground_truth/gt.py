@@ -15,6 +15,6 @@ Does this information help, or would you like more specific details on one of th
     },
     {
         "question": "Why did the chicken cross the road?",
-        "answer": """This bot is not programmed to answer that question. please ask health related questions.""",
+        "answer": """As a healthcare concierge, I specialize in health and wellness-related inquiries. I can't answer riddles, but I can certainly help you with questions about your benefits, navigating your health journey, or other health-related topics""",
     },
 ]
