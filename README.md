@@ -1,4 +1,4 @@
-# sentence-sim
+# EvalRunner
 
 A minimal, single-turn eval pipeline that:
 
@@ -9,7 +9,7 @@ A minimal, single-turn eval pipeline that:
 5. Computes ROUGE-1 score to check for word matches.
 
 TL;DR
-Think of this as Postman Runner combined with an eval.
+Think of this as Postman Runner + an eval.
 
 > If the required bearer token is not set, the network calls are skipped so you can still experiment locally with the similarity scoring component.
 
@@ -119,7 +119,64 @@ def score_similarity(result_ans: str, golden_ans: str) -> float:
 
 ---
 
-## 📘 Ground Truth Dataset
+## � ROUGE-1 Lexical Overlap Scoring
+
+In addition to semantic cosine similarity, the project exposes a lightweight helper `rouge_score` to compute ROUGE‑1 (unigram) precision / recall / F1 between the ground‑truth answer and the model answer. This is useful to see whether key words are present even if paraphrased structure changes.
+
+### Import & Usage
+
+```python
+from similarity_scorer.score import rouge_score
+
+scores = rouge_score(
+    result_ans="Your LSA contribution is $42.",
+    golden_ans="42 dollars is your LSA contribution",
+)
+print(scores)
+```
+
+Output (example):
+
+```
+{'rouge1': Score(precision=1.0, recall=0.8333333333333334, fmeasure=0.9090909090909091)}
+```
+
+You can access individual metrics:
+
+```python
+score_obj = scores["rouge1"]
+print(score_obj.precision, score_obj.recall, score_obj.fmeasure)
+```
+
+### Function Signature
+
+```python
+def rouge_score(result_ans: str, golden_ans: str):
+    """Returns a dict mapping 'rouge1' -> Score(precision, recall, fmeasure)."""
+```
+
+Internally it instantiates `rouge_score.rouge_scorer.RougeScorer(["rouge1"], use_stemmer=True)` and computes scores with `golden_ans` treated as the reference and `result_ans` as the candidate.
+
+### When to Use Semantic vs ROUGE
+
+| Use Case | Prefer |
+|----------|--------|
+| Meaning preservation despite paraphrase | `score_similarity` (SentenceTransformer cosine) |
+| Exact keyword coverage / missing terms | `rouge_score` |
+| Quick lexical sanity check (fast, no model download) | `rouge_score` |
+| Nuanced semantic equivalence beyond surface form | `score_similarity` |
+
+### Notes
+
+* Only ROUGE‑1 is computed right now; add `rouge2`, `rougeL` by extending the list passed to `RougeScorer`.
+* Stemming (`use_stemmer=True`) normalizes simple word variants (e.g., "running" → "run").
+* ROUGE is asymmetric: recall emphasizes how much of the reference appears in the candidate; precision emphasizes how focused the candidate is relative to the reference.
+* For short answers, ROUGE‑1 can be harsh—consider complementing with semantic similarity (already printed by `score_similarity`).
+
+
+---
+
+## �📘 Ground Truth Dataset
 
 File: `ground_truth/gt.py`
 
