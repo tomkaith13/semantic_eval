@@ -29,6 +29,9 @@ def run_examples() -> None:
             stream=True,
         )
         response = parse_last_run_event(run_events)
+        if response is None:
+            print("No valid response parsed from run events; skipping scoring.")
+            return
         print("*" * 100)
         print("Scoring similarity against ground truth answer...")
         sim_score = score_similarity(response, example["answer"])
