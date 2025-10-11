@@ -8,6 +8,12 @@ repos:
     rev: 22.10.0
     hooks:
     -   id: black
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 'v1.18.2'  # Use the sha / tag you want to point at
+    hooks:
+    -   id: mypy
+        args: [--install-types, --non-interactive, --ignore-missing-imports]
+        additional_dependencies: [tokenize-rt==3.2.0]
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
   rev: v0.14.0
@@ -17,9 +23,3 @@ repos:
       args: [ --fix ]
     # Run the formatter.
     - id: ruff-format
--   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v1.18.2'  # Use the sha / tag you want to point at
-    hooks:
-    -   id: mypy
-        args: [--install-types, --non-interactive, --ignore-missing-imports]
-        additional_dependencies: [tokenize-rt==3.2.0]
