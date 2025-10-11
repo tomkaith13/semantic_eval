@@ -1,10 +1,10 @@
 import json
-from typing import Any, Dict, List, Optional
+from typing import Optional, Any
 
 __all__ = ["parse_last_run_event"]
 
 
-def parse_last_run_event(run_events: List[Dict[str, Any]] | None) -> Optional[str]:
+def parse_last_run_event(run_events: list[dict[str, Any]] | None) -> Optional[str]:
     """Extract first text part from the last run event.
 
     Returns the extracted text or None.
