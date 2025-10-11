@@ -308,12 +308,12 @@ print(score_similarity(
 ...     "Your LSA contribution is $42.",
 ...     "42 dollars is your LSA contribution",
 ... ))
-Similarity score between 
- Obtained answer: 'Your LSA contribution is $42.' 
+Similarity score between
+ Obtained answer: 'Your LSA contribution is $42.'
 
 AND
 
- Golden answer: '42 dollars is your LSA contribution' 
+ Golden answer: '42 dollars is your LSA contribution'
 
 is
 
@@ -325,4 +325,3 @@ is
 ---
 
 Happy hacking! 🎯
-
