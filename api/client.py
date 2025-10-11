@@ -1,6 +1,6 @@
 import os
 import json
-from typing import Any, Dict
+from typing import Any, Dict, List
 from uuid import uuid4
 import requests
 
@@ -63,7 +63,7 @@ def run_message(
     run_id: str | None = None,
     stream: bool = True,
     timeout: int = 30,
-) -> list[Dict[str, Any]] | None:
+) -> List[Dict[str, Any]] | None:
     """Call the /v1/run endpoint.
 
     Returns list of streamed events (if stream=True) or dict / None.
