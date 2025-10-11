@@ -57,14 +57,36 @@ git clone <your-fork-or-repo-url> sentence-sim
 cd sentence-sim
 ```
 
-### 2. Install with uv (recommended if you have it)
+### 2. Install uv (if you don't already have it)
+
+Check if it's already installed:
+```bash
+uv --version || echo "uv not installed"
+```
+
+Install options (pick one):
+
+| Method | Command |
+|--------|---------|
+| Official install script | `curl -LsSf https://astral.sh/uv/install.sh | sh` |
+| Homebrew (macOS/Linux)  | `brew install uv` |
+| pipx (keeps env isolated)| `pipx install uv` |
+
+After install, ensure `~/.local/bin` (or the path printed by the script) is on your `PATH`, then verify:
+```bash
+uv --version
+```
+
+If you prefer not to install `uv`, you can still use a standard virtual environment + `pip` (see Alternative: pip section below).
+
+### 3. Install dependencies with uv
 ```bash
 uv sync
 ```
 This will create/refresh a virtual environment and install dependencies from `pyproject.toml` + `uv.lock`.
 
 
-### 3. Configure Environment
+### 4. Configure Environment
 Create a `.env` file (or export in your shell):
 ```
 API_BASE_URL=http://localhost:8080
@@ -72,7 +94,7 @@ BEARER_TOKEN=your_api_token_here
 ```
 `API_BASE_URL` defaults to `http://localhost:8080` if omitted. If `BEARER_TOKEN` is omitted, the script will print a message and skip the API portion (the similarity scoring loop will also be skipped because no session is established).
 
-### 4. Run
+### 5. Run
 ```bash
 uv run main.py
 ```
