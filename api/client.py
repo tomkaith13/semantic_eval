@@ -63,7 +63,7 @@ def run_message(
     run_id: str | None = None,
     stream: bool = True,
     timeout: int = 30,
-) -> Dict[str, Any] | list[Dict[str, Any]] | None:
+) -> list[Dict[str, Any]] | None:
     """Call the /v1/run endpoint.
 
     Returns list of streamed events (if stream=True) or dict / None.
@@ -144,9 +144,9 @@ def run_message(
             return events
         else:
             try:
-                return resp.json()
+                return [resp.json()]
             except json.JSONDecodeError:
-                return {"raw": resp.text[:500]}
+                return [{"raw": resp.text[:500]}]
     except requests.RequestException as exc:
         print(f"[run] Request failed: {exc}")
         return None

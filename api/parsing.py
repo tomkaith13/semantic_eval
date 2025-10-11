@@ -13,6 +13,9 @@ def parse_last_run_event(run_events: List[Dict[str, Any]] | None) -> Optional[st
         print("No run events to parse.")
         return None
     last = run_events[-1]
+    if not isinstance(last, dict):
+        print("Last run event is not a dict.")
+        return None
     data = last.get("data")
     print("*" * 40)
     if not isinstance(data, str):
