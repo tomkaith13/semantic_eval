@@ -12,7 +12,7 @@ repos:
     rev: 'v1.18.2'  # Use the sha / tag you want to point at
     hooks:
     -   id: mypy
-        args: [--install-types, --non-interactive, --ignore-missing-imports]
+        args: [--strict,--install-types, --non-interactive, --ignore-missing-imports]
         additional_dependencies: [tokenize-rt==3.2.0]
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.

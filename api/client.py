@@ -21,7 +21,7 @@ SESSIONS_URL = _build_url("/v1/sessions")
 RUN_URL = _build_url("/v1/run")
 
 
-def create_session(payload: Dict[str, Any] | None = None) -> Dict[str, Any] | None:
+def create_session(payload: Dict[str, Any] | None = None) -> Any | None:
     """Call the sessions API.
 
     Returns parsed JSON (dict) or None on failure / missing token.
@@ -107,7 +107,7 @@ def run_message(
             events: list[Dict[str, Any]] = []
             current: Dict[str, Any] = {}
 
-            def finalize_current():
+            def finalize_current() -> None:
                 nonlocal current
                 if not current:
                     return

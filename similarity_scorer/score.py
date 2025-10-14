@@ -1,4 +1,5 @@
 from sentence_transformers import SentenceTransformer, util
+from typing import Any
 
 # Load a pre-trained model
 # model = SentenceTransformer('all-MiniLM-L6-v2')
@@ -10,7 +11,7 @@ text2 = "A feline is resting on a mat."
 text3 = "The car is parked outside."
 
 
-def score_similarity(result_ans=text1, golden_ans=text2):
+def score_similarity(result_ans: str = text1, golden_ans: str = text2) -> float:
     # Generate embeddings for the strings
     embedding1 = model.encode(result_ans, convert_to_tensor=True)
     embedding2 = model.encode(golden_ans, convert_to_tensor=True)
@@ -20,10 +21,10 @@ def score_similarity(result_ans=text1, golden_ans=text2):
     print(
         f"Similarity score between \n Obtained answer: '{result_ans}' \n\nAND\n\n Golden answer: '{golden_ans}' \n\nis\n\n{cosine_score.item():.4f}"
     )
-    return cosine_score.item()
+    return float(cosine_score.item())
 
 
-def rouge_score(result_ans=text1, golden_ans=text2):
+def rouge_score(result_ans: str = text1, golden_ans: str = text2) -> Any:
     from rouge_score import rouge_scorer
 
     scorer = rouge_scorer.RougeScorer(["rouge1"], use_stemmer=True)
